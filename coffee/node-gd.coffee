@@ -41,6 +41,15 @@ save_func = (format, len) ->
 util = require 'util'
 fs = require 'fs'
 
+# Old nodes doesn't have existsSync
+if not fs.existsSync
+	fs.existsSync = (path)->
+		try
+			stat = fs.statSync(path)
+			return stat.isFile() or stat.isDirectory()
+		catch e
+			return false
+
 # not sure what dif. is between Release and default
 # but its not consistent across node installations
 if fs.existsSync(lib = __dirname+'/../build/Release/node-gd.node')
