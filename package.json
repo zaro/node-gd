@@ -8,8 +8,7 @@
   },
   "scripts": {
     "pretest": "coffee --bare -o js coffee/node-gd.coffee && node-gyp rebuild",
-    "test": "mocha --reporter spec --bail --ui bdd --colors --compilers coffee:coffee-script --require coffee-script test/test.coffee",
-    "install": "node-gyp rebuild"
+    "test": "mocha --reporter spec --bail --ui bdd --colors --compilers coffee:coffee-script --require coffee-script test/test.coffee"
   },
   "repository": {
     "type": "git",
@@ -48,7 +47,7 @@
       "email": "mike@smullindesign.com"
     }
   ],
-  "gypfile": true,
+  "gypfile": false,
   "readmeFilename": "README.md",
   "devDependencies": {
     "mocha": "*",
