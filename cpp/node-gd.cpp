@@ -80,7 +80,7 @@ using namespace node;
   if (!IMG) return Null();                                              \
   HandleScope scope;                                                    \
   Local<Value> _arg_ = External::New(IMG);                              \
-  Persistent<Object> _image_(Image::constructor_template->GetFunction()->NewInstance(1, &_arg_)); \
+  Local<Object> _image_(Image::constructor_template->GetFunction()->NewInstance(1, &_arg_)); \
   return scope.Close(_image_);
 
 #define DECLARE_CREATE_FROM(TYPE)                                       \
