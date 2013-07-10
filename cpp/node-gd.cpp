@@ -356,27 +356,54 @@ protected:
     static Handle<Value> New(const Arguments& args) {
       HandleScope scope;
       REQ_EXT_ARG(0, image);
-      (new Image((gdImagePtr)image->Value()))->Wrap(args.This());
+      gdImagePtr imgPtr = (gdImagePtr)image->Value();
+      (new Image(imgPtr))->Wrap(args.This());
+      // Notify v8 for the memory allocation
+      V8::AdjustAmountOfExternalAllocatedMemory(GdImageSize(imgPtr));
       return args.This();
     }
   protected:
     Image(gdImagePtr image) : _image(image) {}
-    ~Image() { if(_image) gdImageDestroy(_image);  }
+    ~Image() { DisposeGdImage();  }
+
+    void DisposeGdImage() {
+      if(_image){
+        // Notify v8 for the memory deallocation
+        V8::AdjustAmountOfExternalAllocatedMemory(-GdImageSize(_image));
+        gdImageDestroy(_image);
+        _image = NULL;
+      }
+    }
 
     gdImagePtr _image;
 
     operator gdImagePtr () const { return _image; }
-
+    /**
+     * GD Image size
+     */
+    static unsigned int GdImageSize(const gdImagePtr image){
+      if(!image){
+        return 0;
+      }
+      unsigned int imgDataSize = sizeof(gdImage);
+      if(gdImageTrueColor(image)){
+        // calculation taken from gdImageCreateTrueColor
+        imgDataSize += image->sy * sizeof (int *);
+        imgDataSize += image->sy * (image->sx * sizeof(int));
+      } else {
+        // calculation taken from gdImageCreate
+        imgDataSize += image->sy * sizeof(unsigned char *);
+        imgDataSize += image->sy * (image->sx * sizeof(unsigned char));
+      }
+      return imgDataSize;
+    }
     /**
      * Destruction, Loading and Saving Functions
      */
     static Handle<Value> Destroy (const Arguments &args)
     {
       Image *im = ObjectWrap::Unwrap<Image>(args.This());
-      if(im->_image){
-        gdImageDestroy(*im);
-        im->_image = NULL;
-      }
+      im->DisposeGdImage();
 
       return Undefined();
     }
