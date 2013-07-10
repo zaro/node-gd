@@ -47,6 +47,8 @@ if fs.existsSync(lib = __dirname+'/../build/Release/node_gd.node')
   gd_bindings = require lib
 else if fs.existsSync(lib = __dirname+'/../build/default/node_gd.node')
   gd_bindings = require lib
+else if fs.existsSync(lib = __dirname+'/../build/Debug/node_gd.node')
+  gd_bindings = require lib
 else
   throw 'unable to locate node_gd.node within build directory'
 
